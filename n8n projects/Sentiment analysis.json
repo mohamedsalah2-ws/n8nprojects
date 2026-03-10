@@ -1,0 +1,207 @@
+{
+  "name": "Sentiment analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Review",
+        "formDescription": "This Form for providing your review",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name",
+              "placeholder": "EX. Mohamed Salah"
+            },
+            {
+              "fieldLabel": "your Review"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -544,
+        -160
+      ],
+      "id": "3d84259e-5c7d-4768-93af-f473ecb526d3",
+      "name": "On form submission",
+      "webhookId": "5f05444c-9522-4731-94b2-86d642686865",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=This is the customer review:{{ $json['your Review'] }}\nYou are an expert in sentiment analysis. When I give you a customer review, classify its overall sentiment and reply with exactly one word: \"Positive\", \"Negative\", er \"Neutral\". Do not add any extra text or explanation-just the single label."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "da4c6bc3-814f-4d42-9147-c693ad8ea88c",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VfGvMRNf9OzP8roj",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1__T7kS4qfohWj9Om7GjKYc7-tlzMuu8CYFLD9AJ05uM",
+          "mode": "list",
+          "cachedResultName": "sentiment analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1__T7kS4qfohWj9Om7GjKYc7-tlzMuu8CYFLD9AJ05uM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1__T7kS4qfohWj9Om7GjKYc7-tlzMuu8CYFLD9AJ05uM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Review": "={{ $json.output[0].content[0].text }}",
+            "Name": "={{ $json['Your Name'] }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Review",
+              "displayName": "Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        -192
+      ],
+      "id": "73eb2fc5-b48f-4c96-9719-ffcbeb4f4c10",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oVsOak2gJcEiIthg",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        208,
+        -192
+      ],
+      "id": "f9869255-870e-4923-8401-115b6cf0f3f8",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d3fa2b96-7654-4afb-93e2-7d2cf80983d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6f44544d4df2b8a58b5741152a56bfa0c39ed168e2834498b68c8e663a36cec"
+  },
+  "id": "LoBCHZxhOkUTKxlq_BbVJ",
+  "tags": []
+}

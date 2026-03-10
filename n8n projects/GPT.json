@@ -1,0 +1,220 @@
+{
+  "name": "GPT",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        -32
+      ],
+      "id": "de08d0ab-cec6-4e1b-90fd-1761b8ecd48f",
+      "name": "Telegram Trigger",
+      "webhookId": "c7a0b330-7809-4fe3-93d7-733f6881a6a0",
+      "credentials": {
+        "telegramApi": {
+          "id": "z1cIZhNOxVlBceXt",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Overview\nYou are a Telegram student attendance agent. Your job is to process student messages and record attendance status. The current date and time is {{ $now.toString() }}\n\n## Tools\n- Google Sheets (Append Row): Store one attendance record per student message\n\n## Rules\n- Output JSON only, no extra text\n- One message equals one attendance record\n- Status must be: Present or Absent\n\n## Instructions\n1) Read the Telegram message\n2) Identify the student ID or username\n3) Determine attendance status based on the message\n4) Output JSON using the exact schema\n\n## Output Schema\n{\n  \"studentId\": \"<Telegram user ID or username>\",\n  \"status\": \"<Present | Absent>\",\n  \"date\": \"<ISO date>\"\n}\n\n## Examples\nInput: \"I am here\"\n- Output: { \"studentId\": \"...\", \"status\": \"Present\", \"date\": \"...\" }\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        -32
+      ],
+      "id": "9ff82a29-016a-498b-9807-10e9b18853dc",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        192
+      ],
+      "id": "aa2aebff-943e-49a7-91a1-164f45546b71",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "V0bCLeLSWEN3EzH3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1I6l7BSnfaOKIJ2ZTj_Dk4AHZerd0Re6s6Dz039ELMgo",
+          "mode": "list",
+          "cachedResultName": "n8n GPT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1I6l7BSnfaOKIJ2ZTj_Dk4AHZerd0Re6s6Dz039ELMgo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1I6l7BSnfaOKIJ2ZTj_Dk4AHZerd0Re6s6Dz039ELMgo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.output.studentId }}",
+            "attendencse": "={{ $json.output.attendance }}",
+            "date": "={{ $json.output.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "attendencse",
+              "displayName": "attendencse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "506c0132-6fe1-44a8-add7-d96c20ef763a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPoAQv0Um1W1L10z",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"studentId\": \"<provided user ID>\",\n  \"attendance\": \"<Present | Absent>\",\n  \"message\": \"<original message text>\",\n  \"date\": \"<ISO date>\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        176
+      ],
+      "id": "daf6540f-976b-451e-bae7-aae1a3a14585",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "04f1e7cf-dd29-4861-bb8d-c61b47298534",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac52fa9fa7244abc61a934d4d779aff2afd61e496c8b6bcce06bcf38de01a5a8"
+  },
+  "id": "Tsm1MnIo7ELa68FnNIli8",
+  "tags": []
+}

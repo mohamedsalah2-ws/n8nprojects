@@ -1,0 +1,452 @@
+{
+  "name": "RAG chatbot v2",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1lJcxE_cqGocMmfaCNjgrXEzJU4qfKDmc",
+          "mode": "list",
+          "cachedResultName": "n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1lJcxE_cqGocMmfaCNjgrXEzJU4qfKDmc"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        -144
+      ],
+      "id": "a1f3c66c-4505-42d8-aeee-0858086debf7",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FpLJraykFrBlfbsY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -688,
+        -144
+      ],
+      "id": "9c381404-39e1-4812-af37-34d10640717b",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FpLJraykFrBlfbsY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "v2n8nrag",
+          "mode": "list",
+          "cachedResultName": "v2n8nrag"
+        },
+        "options": {
+          "pineconeNamespace": "n8ntestv2"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        -144
+      ],
+      "id": "adc0e4a7-3471-4260-8aee-d94ee7a26a68",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "3iTGP4Pp7Fs5zEB9",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        96
+      ],
+      "id": "1d2624b3-72ed-472b-b2e6-d8d5f4616f4f",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "VfGvMRNf9OzP8roj",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "BM Brand Preview"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        64
+      ],
+      "id": "8bbb24c9-8c25-4b55-a101-adfb722953a1",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "# Knowledge Base",
+        "height": 544,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        -240
+      ],
+      "id": "a8cda9c8-04a5-4088-bf2b-827f6b64c985",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# RAG Chatbot",
+        "height": 720,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -240
+      ],
+      "id": "0ace309c-2337-4d3f-93bc-cdc524f4c4f7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an AI assistant specialized in analyzing BM Brand Preview’s quarterly financial reports. Your main goal is to answer questions accurately and precisely using the vector database, which contains relevant Q1 and Q2 reports.\n\nProvide only information that comes directly from these reports or verified data. If the requested information is missing or unclear, explicitly state that there is insufficient data.\n\nKeep responses concise and to the point. Include specific numbers and facts whenever possible, and clearly indicate whether the information is sourced from Q1 or Q2.\n\nDeliver quick, reliable insights into Apple’s quarterly financials without adding unnecessary details."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        144,
+        -128
+      ],
+      "id": "4377d0c4-d8de-42a2-b85c-dee4fd3c92b6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Mohamed. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -32,
+        -128
+      ],
+      "id": "caead1be-7e20-4c22-b1ef-2fbe59d1f7a3",
+      "name": "When chat message received",
+      "webhookId": "f7daa4f8-44ca-43d9-81a2-34b70e9dbe95"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        80
+      ],
+      "id": "f7e0d024-7bd4-4842-9e23-1e228def3cb7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VfGvMRNf9OzP8roj",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        80
+      ],
+      "id": "c5f80b75-62b7-47e8-b918-cd6e6553a602",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Returns documents related to BM Brand Preview reports, including financials, outlook, margins, and all key details from the earnings reports.",
+        "topK": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        16
+      ],
+      "id": "218fa33a-2e73-491f-b651-9621cf197060",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "v2n8nrag",
+          "mode": "list",
+          "cachedResultName": "v2n8nrag"
+        },
+        "options": {
+          "pineconeNamespace": "BM Brand Preview"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        208
+      ],
+      "id": "d3672edd-76df-48fb-9c87-64afce98aee1",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "3iTGP4Pp7Fs5zEB9",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        336
+      ],
+      "id": "9fbe49c4-9a6c-456a-b039-f4e1ba826d8a",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "VfGvMRNf9OzP8roj",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        160
+      ],
+      "id": "e9cefd5e-45e1-44ea-b0d7-d485b7e0936c",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "VfGvMRNf9OzP8roj",
+          "name": "OpenAi account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "a6497362-4097-4007-861d-2705e9c0f7d5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6f44544d4df2b8a58b5741152a56bfa0c39ed168e2834498b68c8e663a36cec"
+  },
+  "id": "iRbzLgrAbIgm3pez",
+  "tags": []
+}
